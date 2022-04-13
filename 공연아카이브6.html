@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <title>DIARY</title>
+
+</head>
+<body>
+    <div id = "app">
+        <v-app>
+            <!--헤더 영역-->
+            <v-card>
+                <!--안드로이드 시스템처럼 보여주기 위함-->
+                <v-system-bar color = "indigo darken-4" dark>
+                    <v-spacer></v-spacer>
+                    <v-icon>mdi-window-minimize</v-icon>
+                    <v-icon>mdi-window-maximize</v-icon>
+                    <v-icon>mdi-close</v-icon>
+                </v-system-bar>
+
+                <!--앱 바-->
+                <v-app-bar color = "indigo" dark flat>
+                    <v-app-bar-nav-icon @click.stop = "ndrawer = !ndrawer"></v-app-bar-nav-icon>
+                    <v-toolbar-title>공연 아카이브</v-toolbar-title>
+                    <v-spacer></v-spacer>
+
+                    <!--검색창-->
+
+                        <v-text-field label = "Search" 
+                        clearable
+                        hide-details
+                        prepend-inner-icon = "mdi-magnify"></v-text-field>
+
+
+                    <template v-slot:extension>
+                        <v-tabs v-model = "tab" align-with title>
+                            <v-tabs-slider color = "cyan"></v-tabs-slider>
+                            <v-tab
+                                v-for = "(category, index) in categories" :key = "index"
+                                v-bind:class = "{active: currentTab === index}"
+                                @click = "currentTab = index">
+                                {{category}}
+                            </v-tab>
+                        </v-tabs>
+                    </template>
+                </v-app-bar>
+
+            </v-card>
+
+            <!--네비게이션 서랍-->
+            
+            <!--네비게이션 서랍: 사용자 정보 및 메뉴-->
+            <div id = "gnbDrawer">
+                <v-navigation-drawer 
+                    v-model = "ndrawer" absolute temporary>
+                    <!--사용자 정보-->
+                    <v-toolbar flat height = "70">
+                        <v-list>
+                            <v-list-item>
+                                <!--사용자 프로필 사진-->
+                                <v-list-item-avatar color = "primary">
+                                </v-list-item-avatar>
+                                
+                                <!--사용자 닉네임/로그인 여부-->
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        쿼카
+                                    </v-list-item-title>
+    
+                                    <v-list-item-subtitle>
+                                        <v-list-item-subtitle>
+                                        쿼카 님 안녕하세요!
+                                    </v-list-item-subtitle>
+                                    
+                                </v-list-item-content>
+    
+                            </v-list-item>
+                        </v-list>
+                    </v-toolbar>
+    
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-btn text>내가 본 공연</v-btn>
+                            </v-list-item-content>
+                            <v-list-item-content>
+                                <v-btn text>내가 쓴 후기</v-btn>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+    
+                    <v-divider></v-divider>
+                    
+                    <!--gnb 메뉴-->
+                    <v-list class = "pt-3">
+                        <v-list-item
+                            v-for = "item in gnbList" :key = "item.gnb" :href = "item.link">
+                            <v-list-item-action>
+                                <v-icon>{{item.icon}}</v-icon>
+                            </v-list-item-action>
+    
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{item.gnb}}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-navigation-drawer>
+                <!--네비게이션 서랍 끝-->
+            </div>
+<!--
+    모양 이상해서 잠깐 주석 처리해 둠
+                        <div id = "bottomDrawer">
+                            <v-navigation-drawer
+                                v-model = "bndrawer" absolute bottom temporary>
+                                <v-list-item-group>
+                                    <v-list>
+                                        <v-list-item
+                                            style = "flex-direction: column;">
+                                            <v-list-item-title>공연 티켓 판매처 선택</v-list-item-title>
+                                            <div class = "bnd_seller">
+                                                <v-chip-group active-class = "primary--text">
+                                                    <v-chip v-for = "seller in sellerList" :key = "seller">{{seller}}</v-chip>
+                                                </v-chip-group>
+                                            </div>
+                                        </v-list-item>
+                
+                                        <v-list-item
+                                            style = "flex-direction: column;">
+                                            <v-list-item-title>지역 선택</v-list-item-title>
+                                            <div class = "bnd_hall">
+                                                <v-chip-group active-class = "primary--text">
+                                                    <v-chip v-for = "city in hallList" :key = "city">{{city}}</v-chip>
+                                                </v-chip-group>
+                                            </div>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-list-item-group>
+                            </v-navigation-drawer>
+
+                        </div>
+
+                    -->
+
+            <v-main>
+                <v-card flat>
+                    <v-card-title class = "text-h3">Weekly 뮤지컬</v-card-title>
+
+                    <!--라이선스/내한 뮤지컬 정보입니다-->
+                    <v-container v-show = "currentTab == 0">
+                        <!--라이선스/내한 뮤지컬 1번 단-->
+                        <v-row dense>
+                            <v-col cols = "12">
+                                <v-card color = "#385f73" dark>
+                                    <!--랭킹 뱃지-->
+                                    <v-card v-bind:style = "ranking_style">
+                                        <v-card-text>1</v-card-text>
+                                    </v-card>
+
+                                    <v-card-title class = "text-h3">
+                                        뮤지컬 지킬앤하이드(Jekyll&Hyde - 세종)
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-subtitle>
+                                        <h3>당신의 심장을 뛰게 할 전율의 무대</h3>
+                                        <p>
+                                            대중적으로 큰 사랑을 받고 있는 대표곡 &lt;This is the Moment&gt; <br>
+                                            아름답고 서정적인 선율의 &lt;Someone Like You&gt;,&lt;Once Upon a Dream&gt; <br>
+                                            숨이 멎을 듯 강렬한 &lt;Alive&gt;, &lt;The Confrontation&gt;까지!
+                                        </p>
+                                    </v-card-subtitle>
+
+                                    <v-divider></v-divider>
+                                    
+                                    <!--빠른 예매 버튼-->
+                                    <v-btn elevation = "2" 
+                                        text
+                                        absolute bottom right
+                                        @click = "bndrawer = !bndrawer">빠른 예매</v-btn>
+                                    
+                                    <v-card-actions>
+                                        <v-btn text>
+                                            <v-icon>keyboard_arrow_right</v-icon>
+                                            예매하러 가기
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <!--라이선스/내한 뮤지컬 2번 단-->
+                        <v-row dense>
+                            <v-col md = "4" sm ="12"
+                                v-for = "(item, visitIndex) in visitList" :key = "visitList.title"
+                                >
+                                <v-card color = "#385f73" dark height = "200" 
+                                    @click = "" :href = "visitList.link">
+                                    <!--랭킹 뱃지-->
+                                    <v-card v-bind:style = "ranking_style">
+                                        <v-card-text>{{visitIndex+2}}</v-card-text>
+                                    </v-card>
+                                    
+                                    <v-card-title class = "text-h5">
+                                        {{item.title}}
+                                    </v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <v-card>
+                            <v-card-actions>
+                                <v-btn text >랭킹 더 보기</v-btn>
+                                <v-spacer></v-spacer>
+                                <!--누르면 제휴 할인 관련 정보 보여줌-->
+                                <v-btn elevation = "2" fab
+                                    absolute top right>
+                                    <v-icon>discount</v-icon>
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+
+                    </v-container>
+
+
+                    <!--창작 뮤지컬 정보입니다-->
+                    <v-container v-show = "currentTab == 1">
+                        <!--창작 뮤지컬 1번 단-->
+                        <v-row dense>
+                            <v-col cols = "12">
+                                <v-card color = "#385f73" dark>
+                                    <!--랭킹 뱃지-->
+                                    <v-card v-bind:style = "ranking_style">
+                                        <v-card-text>1</v-card-text>
+                                    </v-card>
+                                    
+                                    <v-card-title class = "text-h3">
+                                        육군 창작 뮤지컬 &lt;블루헬멧: 메이사의 노래&gt;
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-subtitle>
+                                        <h3>'카무르'와 '한국' 상반되는 두 장소</h3>
+                                        <p>
+                                            뮤지컬 &lt;광화문연가&gt;, &lt;더 데빌&gt; 등 매 작품마다 세련되고 완성도 높은 무대를 선사 <br>
+                                            대체할 수 없는 존재감을 자랑하는 <strong>연출가 '이지나'</strong>
+                                        </p>
+                                    </v-card-subtitle>
+
+                                    <v-divider></v-divider>
+
+                                    <!--빠른 예매 버튼-->
+                                    <v-btn elevation = "2" 
+                                        text
+                                        absolute bottom right
+                                        @click = "bndrawer = !bndrawer">빠른 예매</v-btn>
+
+                                    <v-card-actions>
+                                        <v-btn text>
+                                            <v-icon>keyboard_arrow_right</v-icon>
+                                            예매하러 가기
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <!--창작 뮤지컬 2번 단-->
+                        <v-row dense>
+                            <v-col md = "4" sm ="12"
+                                v-for = "(item, creationIndex) in creationList" :key = "creationList.title"
+                                >
+                                <v-card color = "#385f73" dark height = "200"
+                                    @click = "" :href = "visitList.link">
+                                    <!--랭킹 뱃지-->
+                                    <v-card v-bind:style = "ranking_style">
+                                        <v-card-text>{{creationIndex+2}}</v-card-text>
+                                    </v-card>
+
+                                    <v-card-title class = "text-h5">
+                                        {{item.title}}
+                                    </v-card-title>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <v-card>
+                            <v-card-actions>
+                                <v-btn text >랭킹 더 보기</v-btn>
+                                <v-spacer></v-spacer>
+                                <!--누르면 제휴 할인 관련 정보 보여줌-->
+                                <v-btn elevation = "2" fab
+                                    absolute top right>
+                                    <v-icon>discount</v-icon>
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-container>
+
+                    <!--오픈 뮤지컬-->
+                    <!--2022-04-26-->
+                    <v-card>
+                        <v-card-title class = "text-h3">TICKET OPEN</v-card-title>
+                        <v-slide-group
+                            v-model = "slider" class = "pa-4" center-active show-arrows>
+                            <v-slide-item
+                                v-for = "p in 5" :key = "p" v-slot = "{active, toggle}">
+                                <v-card
+                                    :color = "active? 'primary':'grey lighten-1' "
+                                    class = "ma-4" height = "200" width = "100" @click = "toggle">
+                                    <v-card-text>
+                                        {{p.title}}
+                                    </v-card-text>
+                                    <v-row
+                                        class = "fill-height" align = "center" justify = "center">
+                                        <v-scale-transition>
+                                            <v-icon
+                                                v-if = "active" color = "white" size = "48" v-text = "'mdi-close-circle-outline'">
+                                            </v-icon>
+                                        </v-scale-transition>
+                                    </v-row>
+                                </v-card>
+                        
+                            </v-slide-item>
+                        </v-slide-group>
+
+                    </v-card>
+                </v-card>
+
+            </v-main>
+
+            <v-footer>
+                
+                <div class = "mx-auto">Copyright &copy; {{new Date().getFullYear()}}</div>
+            </v-footer>
+        </v-app>
+    </div>
+
+    <script>
+
+        new Vue({
+            el: "#app",
+            vuetify: new Vuetify(),
+            data: {
+                //네비게이션 서랍 관련
+                ndrawer: false,
+                gnbList: [
+                    {gnb: '뮤지컬', link: '#', icon: 'chevron_right'},
+                    {gnb: '연극', link: '#', icon: 'chevron_right'},
+                    {gnb: '콘서트', link: '#', icon: 'chevron_right'},
+                    {gnb: '클래식/무용', link: '#', icon: 'chevron_right'},
+                    {gnb: '매거진', link: '#', icon: 'chevron_right'}
+                ],
+
+                //빠른 예매 관련
+                bndrawer: false,
+
+                sellerList: ['예스24', '옥션', '인터파크'],
+                hallList: ['전체', '서울', '경기/강원', '경상/대구/부산', '전라/광주', '충청/대전', '제주'],
+
+
+
+                //탭 관련
+                tab: null,
+                categories: ['라이선스/내한 뮤지컬', '창작 뮤지컬'],
+                currentTab: 0,
+
+                //뮤지컬 정보 관련
+                visitList: [
+                    {title: '뮤지컬 지킬앤하이드(Jekyll&Hyde)', link: '#'},
+                    {title: '뮤지컬 <레베카> - 대구', link: '#'},
+                    {title: '뮤지컬 <아이다>', link: '#'}
+                ],
+                creationList: [
+                    {title: '뮤지컬 <쇼맨_어느 독재자의 네 번째 대역배우>', link: '#'},
+                    {title: '뮤지컬 <또! 오해영>', link: '#'},
+                    {title: '뮤지컬 <더 테일 에이프릴 풀스>', link: '#'},
+                ],
+
+                //랭킹 표시 관련
+                ranking_style: {
+                    border: "none",
+                    width: "54px", height: "54px",
+                    textAlign: "center"
+                },
+
+                //OPEN TICKET 관련
+                slider: null,
+                openList: [
+                    {title: '', link: '#'},
+                ]
+            },
+            methods: {
+            }
+
+        })
+    </script>
+</body>
+</html>
